@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SciEval: A Benchmark for Automatic Evaluation of K-12 Science Instructional Materials</title>
+  <meta name="description" content="SciEval is a benchmark dataset for evaluating LLMs on K-12 science instructional materials using the EQuIP rubric.">
+  <style>
+    :root {
+      --primary: #1a237e;
+      --primary-light: #283593;
+      --accent: #ff6f00;
+      --bg: #fafafa;
+      --card-bg: #ffffff;
+      --text: #212121;
+      --text-secondary: #555;
+      --border: #e0e0e0;
+      --code-bg: #f5f5f5;
+      --cat1: #1565c0;
+      --cat2: #2e7d32;
+      --cat3: #6a1b9a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: #fff;
+      padding: 80px 24px 64px;
+      text-align: center;
+    }
+    .hero h1 { font-size: 3rem; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.5px; }
+    .hero .subtitle { font-size: 1.15rem; opacity: 0.92; max-width: 680px; margin: 0 auto 32px; }
+    .hero .badge { display: inline-block; background: rgba(255,255,255,0.18); padding: 4px 14px; border-radius: 20px; font-size: 0.85rem; margin-bottom: 20px; }
+    .hero-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px; border-radius: 8px; text-decoration: none;
+      font-weight: 600; font-size: 0.95rem; transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .btn-white { background: #fff; color: var(--primary); }
+    .btn-outline { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.6); }
+    .btn-outline:hover { border-color: #fff; }
+
+    /* Sections */
+    section { padding: 56px 0; }
+    section:nth-child(even) { background: #fff; }
+    .section-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 20px; color: var(--primary); }
+
+    /* Stats */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 8px;
+    }
+    .stat-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+      padding: 28px 16px; text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .stat-card .number { font-size: 2.2rem; font-weight: 700; color: var(--primary); }
+    .stat-card .label { font-size: 0.88rem; color: var(--text-secondary); margin-top: 4px; }
+
+    /* Dataset details */
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 16px; }
+    .detail-box h3 { font-size: 1.05rem; margin-bottom: 10px; color: var(--primary); }
+    .detail-box table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .detail-box th, .detail-box td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+    .detail-box th { background: var(--code-bg); font-weight: 600; }
+    .split-info { display: flex; gap: 16px; margin-top: 12px; }
+    .split-badge {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px 20px; flex: 1; text-align: center;
+    }
+    .split-badge .num { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+    .split-badge .lbl { font-size: 0.82rem; color: var(--text-secondary); }
+
+    /* Criteria */
+    .criteria-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 16px; }
+    .criteria-col h3 {
+      font-size: 0.95rem; font-weight: 700; padding: 10px 14px;
+      border-radius: 8px 8px 0 0; color: #fff;
+    }
+    .criteria-col:nth-child(1) h3 { background: var(--cat1); }
+    .criteria-col:nth-child(2) h3 { background: var(--cat2); }
+    .criteria-col:nth-child(3) h3 { background: var(--cat3); }
+    .criteria-col ul {
+      list-style: none; border: 1px solid var(--border); border-top: none;
+      border-radius: 0 0 8px 8px; overflow: hidden;
+    }
+    .criteria-col li { padding: 10px 14px; font-size: 0.88rem; border-bottom: 1px solid var(--border); }
+    .criteria-col li:last-child { border-bottom: none; }
+    .criteria-col li strong { color: var(--text); }
+
+    /* Download */
+    .download-section { text-align: center; }
+    .download-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 24px 0; }
+    .download-card {
+      background: var(--card-bg); border: 2px solid var(--border); border-radius: 12px;
+      padding: 28px 32px; text-align: center; text-decoration: none; color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s; min-width: 220px;
+    }
+    .download-card:hover { border-color: var(--primary); box-shadow: 0 4px 16px rgba(26,35,126,0.12); }
+    .download-card .icon { font-size: 2rem; margin-bottom: 8px; }
+    .download-card .name { font-weight: 700; font-size: 1.05rem; }
+    .download-card .size { font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px; }
+    .download-note { font-size: 0.88rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; }
+
+    /* Citation */
+    .cite-block {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 20px 24px; position: relative; overflow-x: auto;
+    }
+    .cite-block pre { font-family: "SF Mono", "Fira Code", "Consolas", monospace; font-size: 0.85rem; white-space: pre; line-height: 1.5; }
+    .copy-btn {
+      position: absolute; top: 10px; right: 10px; background: var(--primary); color: #fff;
+      border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;
+    }
+    .copy-btn:hover { opacity: 0.9; }
+
+    /* Footer */
+    footer {
+      background: var(--primary); color: rgba(255,255,255,0.85); padding: 32px 24px;
+      text-align: center; font-size: 0.9rem;
+    }
+    footer a { color: #fff; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2rem; }
+      .hero { padding: 48px 20px 40px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .detail-grid { grid-template-columns: 1fr; }
+      .criteria-grid { grid-template-columns: 1fr; }
+      .download-buttons { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="container">
+    <div class="badge">AIED 2026</div>
+    <h1>SciEval</h1>
+    <p class="subtitle">A Benchmark for Automatic Evaluation of K&ndash;12 Science Instructional Materials</p>
+    <div class="hero-buttons">
+      <a href="https://github.com/Freeman-gif/SciEval" class="btn btn-white">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- About -->
+<section>
+  <div class="container">
+    <h2 class="section-title">About</h2>
+    <p>
+      <strong>SciEval</strong> is the first benchmark dataset for <strong>Automatic Instructional Materials Evaluation (AIME)</strong> &mdash; a generative AI task where large language models evaluate K&ndash;12 science instructional materials by producing quality scores and evidence-based justifications aligned with the <strong>EQuIP rubric</strong>.
+    </p>
+    <p style="margin-top:12px;">
+      The dataset consists of NGSS-aligned science lessons sourced from <strong>OpenSciEd</strong>, annotated by trained science education researchers through a multi-round process with structured adjudication. Each lesson is evaluated across 13 criteria spanning three-dimensional learning design, instructional supports, and student progress monitoring.
+    </p>
+  </div>
+</section>
+
+<!-- Stats -->
+<section>
+  <div class="container">
+    <h2 class="section-title">Dataset at a Glance</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="number">273</div>
+        <div class="label">Lesson-level materials</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">3,549</div>
+        <div class="label">Criterion-level annotations</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">13</div>
+        <div class="label">EQuIP criteria</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">89.7%</div>
+        <div class="label">Inter-rater agreement</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Dataset Details -->
+<section>
+  <div class="container">
+    <h2 class="section-title">Dataset Details</h2>
+    <div class="detail-grid">
+      <div class="detail-box">
+        <h3>Annotation Schema</h3>
+        <table>
+          <tr><th>Column</th><th>Description</th></tr>
+          <tr><td><code>ID</code></td><td>Unique identifier (e.g., <code>Course_lesson_N_Criterion</code>)</td></tr>
+          <tr><td><code>File</code></td><td>Source PDF filename</td></tr>
+          <tr><td><code>Criterion</code></td><td>EQuIP rubric criterion code</td></tr>
+          <tr><td><code>Score</code></td><td>Rating: 0 (N/A), 1 (Inadequate), 2 (Adequate), 3 (Extensive)</td></tr>
+          <tr><td><code>Evidence</code></td><td>Detailed justification with page references</td></tr>
+          <tr><td><code>Pos_Evidence</code></td><td>Positive evidence examples</td></tr>
+          <tr><td><code>Neg_Evidence</code></td><td>Negative evidence / gaps</td></tr>
+          <tr><td><code>Advice</code></td><td>Reviewer recommendations</td></tr>
+        </table>
+      </div>
+      <div class="detail-box">
+        <h3>Corpus Statistics</h3>
+        <table>
+          <tr><th>Property</th><th>Value</th></tr>
+          <tr><td>Instructional units</td><td>32</td></tr>
+          <tr><td>Total pages</td><td>4,499</td></tr>
+          <tr><td>Avg. pages per lesson</td><td>16.5</td></tr>
+          <tr><td>Avg. words per lesson</td><td>~5,908</td></tr>
+          <tr><td>Score 0 (N/A)</td><td>41.8%</td></tr>
+          <tr><td>Score 3 (Extensive)</td><td>54.2% of active</td></tr>
+        </table>
+        <h3 style="margin-top:20px;">Train / Test Split</h3>
+        <div class="split-info">
+          <div class="split-badge">
+            <div class="num">218</div>
+            <div class="lbl">Training PDFs</div>
+          </div>
+          <div class="split-badge">
+            <div class="num">55</div>
+            <div class="lbl">Test PDFs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EQuIP Criteria -->
+<section>
+  <div class="container">
+    <h2 class="section-title">EQuIP Rubric Criteria</h2>
+    <p style="margin-bottom:12px;">Each lesson is evaluated across 13 criteria organized into three categories:</p>
+    <div class="criteria-grid">
+      <div class="criteria-col">
+        <h3>I: NGSS 3D Design</h3>
+        <ul>
+          <li><strong>I.A</strong> Explaining Phenomena / Designing Solutions</li>
+          <li><strong>I.B.1</strong> Science &amp; Engineering Practices (SEPs)</li>
+          <li><strong>I.B.2</strong> Disciplinary Core Ideas (DCIs)</li>
+          <li><strong>I.B.3</strong> Crosscutting Concepts (CCCs)</li>
+          <li><strong>I.C</strong> Integrating the Three Dimensions</li>
+        </ul>
+      </div>
+      <div class="criteria-col">
+        <h3>II: Instructional Supports</h3>
+        <ul>
+          <li><strong>II.A</strong> Relevance and Authenticity</li>
+          <li><strong>II.B</strong> Student Ideas</li>
+          <li><strong>II.C</strong> Scientific Accuracy</li>
+        </ul>
+      </div>
+      <div class="criteria-col">
+        <h3>III: Monitoring Student Progress</h3>
+        <ul>
+          <li><strong>III.A</strong> Monitoring 3D Performance</li>
+          <li><strong>III.B</strong> Formative Assessment</li>
+          <li><strong>III.C</strong> Scoring Guidance</li>
+          <li><strong>III.D</strong> Unbiased Tasks / Items</li>
+          <li><strong>III.E</strong> Opportunity to Learn</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Download -->
+<section>
+  <div class="container download-section">
+    <h2 class="section-title">Getting Started</h2>
+    <p>Download the SciEval dataset to begin your research:</p>
+    <div class="download-buttons">
+      <a href="https://github.com/Freeman-gif/SciEval/releases/download/v1.0/SciEval-PDFs-v1.0.zip" class="download-card">
+        <div class="icon">📄</div>
+        <div class="name">Lesson PDFs</div>
+        <div class="size">221 PDF files &middot; ~440 MB</div>
+      </a>
+      <a href="https://github.com/Freeman-gif/SciEval/releases/download/v1.0/SciEval-Annotations-v1.0.zip" class="download-card">
+        <div class="icon">📊</div>
+        <div class="name">Annotations</div>
+        <div class="size">222 XLSX files &middot; ~1.9 MB</div>
+      </a>
+    </div>
+    <p class="download-note">
+      Each annotation file contains 13 rows (one per EQuIP criterion) with scores, evidence, and reviewer justifications. The PDFs and annotations are split into 218 training and 55 test documents via stratified sampling.
+    </p>
+  </div>
+</section>
+
+<!-- Citation -->
+<section>
+  <div class="container">
+    <h2 class="section-title">Citation</h2>
+    <p style="margin-bottom:14px;">If you use SciEval in your research, please cite our paper:</p>
+    <div class="cite-block">
+      <button class="copy-btn" onclick="copyBibtex()">Copy</button>
+      <pre id="bibtex">@inproceedings{scieval2026,
+  title     = {SciEval: A Benchmark for Automatic Evaluation of
+               K-12 Science Instructional Materials},
+  author    = {Anonymous Authors},
+  booktitle = {Proceedings of the 27th International Conference on
+               Artificial Intelligence in Education (AIED)},
+  year      = {2026}
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p>SciEval &middot; Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> &middot; <a href="https://github.com/Freeman-gif/SciEval/issues">Contact / Issues</a></p>
+  </div>
+</footer>
+
+<script>
+function copyBibtex() {
+  const text = document.getElementById('bibtex').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+</script>
+
+</body>
+</html>
